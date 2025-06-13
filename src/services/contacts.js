@@ -5,23 +5,21 @@ export const getContacts = () => ContactCollection.find();
 export const getContactById = (contactId) =>
   ContactCollection.findById(contactId);
 
-export const addContact = (payload) => ContactCollection.create(payload); 
+export const addContact = (payload) => ContactCollection.create(payload);
 
 export const updateContactById = async (id, payload, options = {}) => {
-  const data = await ContactCollection.findByIdAndUpdate(id, payload, {
-    new: true,
-    includeResultMetadata: true,
-    ...options,
-  });
+  const data = await ContactCollection.findByIdAndUpdate(
+    id,
+    { $set: payload },
+    {
+      new: true,
+      runValidators: true,
+      ...options,
+    },
+  );
 
-  if(!data || !data.value) return null;
-
-  const isNew = data?.lastErrorObject?.upserted;
-
-  return {
-    isNew,
-    data: data?.value
-  };
+  return data;
 };
 
-export const deleteContactById = id => ContactCollection.findByIdAndDelete(id);
+export const deleteContactById = (id) =>
+  ContactCollection.findByIdAndDelete(id);
