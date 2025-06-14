@@ -1,4 +1,5 @@
 import createHttpError from 'http-errors';
+
 import {
   addContact,
   deleteContactById,
@@ -43,8 +44,6 @@ export const addContactController = async (req, res) => {
 export const patchContactByIdController = async (req, res) => {
   const { contactId } = req.params;
   const data = await updateContactById(contactId, req.body);
-
-  console.log(req.body);
 
   if (!data) throw createHttpError(404, 'Contact not found');
 
