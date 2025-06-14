@@ -13,8 +13,8 @@ export const setupServer = () => {
 
   app.use('/contacts', contactsRouter);
 
-  app.use(errorHandler);
   app.use(notFoundHandler);
+  app.use(errorHandler);
 
   const PORT = getEnvVar('PORT');
 
