@@ -22,8 +22,6 @@ export const getContacts = async ({
     query.where('contactType').equals(filters.contactType);
   }
 
-  console.log(filters.isFavourite);
-
   const items = await query;
   const totalItems = await ContactCollection.countDocuments();
 
