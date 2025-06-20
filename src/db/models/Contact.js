@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+import { setUpdateSettings } from './hooks.js';
 
 const ContactSchema = new Schema(
   {
@@ -26,6 +27,19 @@ const ContactSchema = new Schema(
   },
   { versionKey: false, timestamps: true },
 );
+
+ContactSchema.pre('findOneAndUpdate', setUpdateSettings);
+
+export const contactSortFields = [
+  '_id',
+  'name',
+  'phoneNumber',
+  'email',
+  'isFavourite',
+  'contactType',
+  'createdAt',
+  'updatedAt',
+];
 
 const ContactCollection = model('contact', ContactSchema);
 
