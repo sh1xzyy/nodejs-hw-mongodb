@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { setUpdateSettings } from './hooks.js';
 
-const ContactSchema = new Schema(
+const contactSchema = new Schema(
   {
     name: {
       type: String,
@@ -24,11 +24,16 @@ const ContactSchema = new Schema(
       default: 'personal',
       required: true,
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
   },
   { versionKey: false, timestamps: true },
 );
 
-ContactSchema.pre('findOneAndUpdate', setUpdateSettings);
+contactSchema.pre('findOneAndUpdate', setUpdateSettings);
 
 export const contactSortFields = [
   '_id',
@@ -41,6 +46,6 @@ export const contactSortFields = [
   'updatedAt',
 ];
 
-const ContactCollection = model('contact', ContactSchema);
+const ContactCollection = model('contact', contactSchema);
 
 export default ContactCollection;

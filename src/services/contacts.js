@@ -1,4 +1,4 @@
-import { sortList } from '../constants/index.js';
+import { sortList } from '../constants/constants.js';
 import ContactCollection from '../db/models/Contact.js';
 import { calcPaginationData } from '../utils/calcPaginationData.js';
 
@@ -16,6 +16,9 @@ export const getContacts = async ({
     .limit(perPage)
     .sort({ [sortBy]: sortOrder });
 
+  if (filters.userId) {
+    query.where('userId').equals(filters.userId);
+  }
   if (typeof filters.isFavourite === 'boolean') {
     query.where('isFavourite').equals(filters.isFavourite);
   }
@@ -47,16 +50,19 @@ export const getContacts = async ({
   };
 };
 
-export const getContactById = (contactId) =>
-  ContactCollection.findById(contactId);
+export const getContact = (query) => ContactCollection.findOne(query);
 
 export const addContact = (payload) => ContactCollection.create(payload);
 
-export const updateContactById = async (id, payload, options = {}) => {
-  const data = await ContactCollection.findByIdAndUpdate(id, payload, options);
+export const updateContact = async (query, payload, options = {}) => {
+  const data = await ContactCollection.findOneAndUpdate(
+    query,
+    payload,
+    options,
+  );
 
   return data;
 };
 
-export const deleteContactById = (id) =>
-  ContactCollection.findByIdAndDelete(id);
+export const deleteContact = (query) =>
+  ContactCollection.findOneAndDelete(query);
