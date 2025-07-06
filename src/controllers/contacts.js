@@ -10,6 +10,7 @@ import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { contactSortFields } from '../db/models/Contact.js';
 import { parseContactsFilters } from '../utils/filters/parseContactsFilters.js';
+import { handlePhotoUpload } from '../utils/handlePhotoUpload.js';
 
 export const getContactsController = async (req, res) => {
   const { _id: userId } = req.user;
@@ -42,7 +43,8 @@ export const getContactByIdController = async (req, res) => {
 
 export const addContactController = async (req, res) => {
   const { _id: userId } = req.user;
-  const data = await addContact({ ...req.body, userId });
+  const photo = await handlePhotoUpload(req.file);
+  const data = await addContact({ ...req.body, photo, userId });
 
   res.status(201).json({
     status: 201,
@@ -54,7 +56,12 @@ export const addContactController = async (req, res) => {
 export const patchContactByIdController = async (req, res) => {
   const { contactId } = req.params;
   const { _id: userId } = req.user;
-  const data = await updateContact({ _id: contactId, userId }, req.body);
+  const photo = await handlePhotoUpload(req.file);
+
+  const data = await updateContact(
+    { _id: contactId, userId },
+    { ...req.body, photo },
+  );
 
   if (!data) throw createHttpError(404, 'Contact not found');
 

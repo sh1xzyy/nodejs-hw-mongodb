@@ -7,6 +7,9 @@ import {
   accessTokenLifeTime,
   refreshTokenLifeTime,
 } from '../constants/constants.js';
+import jwt from 'jsonwebtoken';
+import { getEnvVar } from '../utils/getEnvVar.js';
+import { sendEmail } from '../utils/sendEmail.js';
 
 export const findSession = (query) => SessionCollection.findOne(query);
 
@@ -69,4 +72,48 @@ export const refreshUser = async ({ refreshToken, sessionId }) => {
 
 export const logoutUser = async (_id) => {
   await SessionCollection.findOneAndDelete({ _id });
+};
+
+export const requestResetToken = async (email) => {
+  const user = await UserCollection.findOne({ email });
+  if (!user) throw createHttpError(404, 'User not found!');
+
+  const jwtSecret = getEnvVar('JWT_SECRET');
+  const appDomain = getEnvVar('APP_DOMAIN');
+
+  const token = jwt.sign({ email }, jwtSecret, { expiresIn: '5m' });
+
+  const resetLink = `${appDomain}/reset-pwd?token=${token}`;
+
+  await sendEmail({
+    from: getEnvVar('SMTP_FROM'),
+    to: email,
+    subject: 'Reset your password',
+    html: `<p>Click <a href="${resetLink}">here</a> to reset your password!</p>`,
+  });
+
+  return true;
+};
+
+export const resetPassword = async ({ password, token }) => {
+  const jwtSecret = getEnvVar('JWT_SECRET');
+
+  let email;
+
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    email = decoded.email;
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      throw createHttpError(401, 'Token is expired or invalid.');
+    }
+  }
+
+  const user = await UserCollection.findOne({ email });
+
+  if (!user) throw createHttpError(404, 'User not found!');
+
+  const hashPassword = await bcrypt.hash(password, 10);
+
+  await UserCollection.updateOne({ email }, { password: hashPassword });
 };
