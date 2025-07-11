@@ -11,7 +11,7 @@ parameters:
     required: true
     schema:
       type: string
-      example: 686a45082273ed27395e1931
+      example: '686a45082273ed27395e1931'
 requestBody:
   content:
     multipart/form-data:
@@ -43,7 +43,7 @@ requestBody:
             type: string
             format: binary
 responses:
-  '201':
+  '200':
     description: Update a contact
     content:
       application/json:
@@ -56,7 +56,7 @@ responses:
           properties:
             status:
               type: integer
-              example: 201
+              example: 200
             message:
               type: string
               example: Successfully updated a contact!
