@@ -11,7 +11,7 @@ parameters:
     required: true
     schema:
       type: string
-      example: 686a45082273ed27395e1931
+      example: '686a45082273ed27395e1931'
 responses:
   '201':
     description: Delete  a contact
